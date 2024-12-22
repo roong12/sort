@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBL 소트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .team-box {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .team {
+            padding: 20px 40px;
+            border: 2px solid #007BFF;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .team:hover {
+            transform: scale(1.1);
+            background-color: #007BFF;
+            color: white;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>KBL 소트</h1>
+    <p>아래 두 팀 중 선호하는 팀을 선택하세요.</p>
+    <div class="team-box" id="team-box">
+        <div class="team" id="team1"></div>
+        <div class="team" id="team2"></div>
+    </div>
+    <div id="results" style="display: none;">
+        <h2>최종 순위</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>순위</th>
+                    <th>팀</th>
+                </tr>
+            </thead>
+            <tbody id="ranking"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const teams = [
+            "원주 DB 프로미",
+            "서울 삼성 썬더스",
+            "고양 소노 스카이거너스",
+            "서울 SK 나이츠",
+            "창원 LG 세이커스",
+            "안양 정관장 레드부스터스",
+            "부산 KCC 이지스",
+            "수원 KT 소닉붐",
+            "대구 한국가스공사 페가수스",
+            "울산 현대모비스 피버스"
+        ];
+
+        let results = {};
+        teams.forEach(team => results[team] = 0);
+
+        const pairs = [];
+        for (let i = 0; i < teams.length; i++) {
+            for (let j = i + 1; j < teams.length; j++) {
+                pairs.push([teams[i], teams[j]]);
+            }
+        }
+
+        let currentIndex = 0;
+
+        const teamBox = document.getElementById("team-box");
+        const team1 = document.getElementById("team1");
+        const team2 = document.getElementById("team2");
+        const resultsDiv = document.getElementById("results");
+        const rankingTable = document.getElementById("ranking");
+
+        function showNextPair() {
+            if (currentIndex >= pairs.length) {
+                showResults();
+                return;
+            }
+
+            const [teamA, teamB] = pairs[currentIndex];
+            team1.textContent = teamA;
+            team2.textContent = teamB;
+        }
+
+        function submitVote(winner) {
+            results[winner]++;
+            currentIndex++;
+            showNextPair();
+        }
+
+        function showResults() {
+            teamBox.style.display = "none";
+            resultsDiv.style.display = "block";
+
+            const sortedResults = Object.entries(results)
+                .sort(([, winsA], [, winsB]) => winsB - winsA);
+
+            sortedResults.forEach(([team], index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${index + 1}</td><td>${team}</td>`;
+                rankingTable.appendChild(row);
+            });
+        }
+
+        team1.addEventListener("click", () => submitVote(team1.textContent));
+        team2.addEventListener("click", () => submitVote(team2.textContent));
+
+        showNextPair();
+    </script>
+</body>
+</html>
